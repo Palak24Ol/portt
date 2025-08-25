@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import {
   Mail,
   Phone,
@@ -44,7 +44,10 @@ import {
   Database, // Added for MongoDB
   Gem,      // Added for Solidity
   Cloud,    // Added for AWS
-  Box       // Added for Docker
+  Box,      // Added for Docker
+  // RESPONSIVE FIX: Added Menu and X icons for mobile navigation
+  Menu,
+  X
 } from 'lucide-react';
 
 // NEW: Reusable component for wavy text effect on hover
@@ -87,6 +90,8 @@ const WavyText = ({ text, className, el: Wrapper = 'h3' }: { text: string, class
 
 function App() {
   const [activeSection, setActiveSection] = useState('home');
+  // RESPONSIVE FIX: State for mobile menu
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { scrollYProgress } = useScroll();
   const paperClipRotate = useTransform(scrollYProgress, [0, 1], [12, 25]);
 
@@ -125,6 +130,8 @@ function App() {
 
   const scrollToSection = (sectionId: string) => {
     document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+    // RESPONSIVE FIX: Close mobile menu on navigation
+    setIsMenuOpen(false);
   };
 
   // Animation variants
@@ -181,7 +188,8 @@ function App() {
   const SectionHeader = ({ title, children }: { title: string, children?: React.ReactNode }) => (
     <div className="relative mb-6">
       <motion.h2
-        className="text-3xl font-bold text-gray-900 bg-yellow-400 inline-block px-4 py-2 rounded"
+        // RESPONSIVE FIX: Adjusted font size for mobile
+        className="text-2xl md:text-3xl font-bold text-gray-900 bg-yellow-400 inline-block px-4 py-2 rounded"
         whileHover={{ scale: 1.05, rotate: -1 }}
         transition={{ type: "spring", stiffness: 300 }}
       >
@@ -199,11 +207,12 @@ function App() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-900 p-4 md:p-8">
+    // RESPONSIVE FIX: Added overflow-x-hidden to prevent horizontal scroll
+    <div className="min-h-screen bg-gray-900 p-4 md:p-8 overflow-x-hidden">
       {/* Enhanced Dynamic Background with Collage Elements */}
-      {/* Floating Board Pins */}
+      {/* RESPONSIVE FIX: Most floating elements are hidden on small screens (md:block) to reduce clutter */}
       <motion.div 
-        className="fixed top-16 left-8 z-5" 
+        className="fixed top-16 left-8 z-5 hidden md:block" 
         variants={floatingVariants} 
         animate="animate"
         initial={{ rotate: -15 }}
@@ -215,7 +224,7 @@ function App() {
       </motion.div>
       
       <motion.div 
-        className="fixed top-32 right-12 z-5" 
+        className="fixed top-32 right-12 z-5 hidden md:block" 
         variants={floatingVariants} 
         animate="animate"
         initial={{ rotate: 25 }}
@@ -227,7 +236,7 @@ function App() {
       </motion.div>
       
       <motion.div 
-        className="fixed bottom-40 left-16 z-5" 
+        className="fixed bottom-40 left-16 z-5 hidden md:block" 
         variants={floatingVariants} 
         animate="animate"
         initial={{ rotate: -30 }}
@@ -238,9 +247,8 @@ function App() {
         </div>
       </motion.div>
 
-      {/* Floating Paperclips */}
       <motion.div 
-        className="fixed top-24 left-1/4 text-gray-400 opacity-20 z-5" 
+        className="fixed top-24 left-1/4 text-gray-400 opacity-20 z-5 hidden lg:block" 
         animate={{ rotate: [0, 10, -10, 0] }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       >
@@ -248,16 +256,15 @@ function App() {
       </motion.div>
       
       <motion.div 
-        className="fixed bottom-32 right-1/4 text-yellow-400 opacity-15 z-5" 
+        className="fixed bottom-32 right-1/4 text-yellow-400 opacity-15 z-5 hidden lg:block" 
         animate={{ rotate: [0, -15, 15, 0] }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
       >
         <Paperclip size={20} />
       </motion.div>
 
-      {/* Floating Stickers/Tags */}
       <motion.div 
-        className="fixed top-1/3 right-8 bg-yellow-400 text-gray-900 px-2 py-1 rounded text-xs font-bold opacity-25 z-5 rotate-12" 
+        className="fixed top-1/3 right-8 bg-yellow-400 text-gray-900 px-2 py-1 rounded text-xs font-bold opacity-25 z-5 rotate-12 hidden md:block" 
         variants={floatingVariants} 
         animate="animate"
         transition={{ delay: 0.5 }}
@@ -266,7 +273,7 @@ function App() {
       </motion.div>
       
       <motion.div 
-        className="fixed bottom-1/3 left-8 bg-red-400 text-white px-2 py-1 rounded text-xs font-bold opacity-20 z-5 -rotate-12" 
+        className="fixed bottom-1/3 left-8 bg-red-400 text-white px-2 py-1 rounded text-xs font-bold opacity-20 z-5 -rotate-12 hidden md:block" 
         variants={floatingVariants} 
         animate="animate"
         transition={{ delay: 1.5 }}
@@ -275,7 +282,7 @@ function App() {
       </motion.div>
       
       <motion.div 
-        className="fixed top-2/3 left-1/3 bg-blue-400 text-white px-2 py-1 rounded text-xs font-bold opacity-15 z-5 rotate-6" 
+        className="fixed top-2/3 left-1/3 bg-blue-400 text-white px-2 py-1 rounded text-xs font-bold opacity-15 z-5 rotate-6 hidden lg:block" 
         variants={floatingVariants} 
         animate="animate"
         transition={{ delay: 2.5 }}
@@ -283,9 +290,8 @@ function App() {
         UI/UX
       </motion.div>
 
-      {/* Floating Symbols */}
       <motion.div 
-        className="fixed top-48 left-12 text-yellow-400 opacity-10 z-5" 
+        className="fixed top-48 left-12 text-yellow-400 opacity-10 z-5 hidden md:block" 
         animate={{ rotate: 360, scale: [1, 1.2, 1] }}
         transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
       >
@@ -293,7 +299,7 @@ function App() {
       </motion.div>
       
       <motion.div 
-        className="fixed bottom-48 right-16 text-green-400 opacity-12 z-5" 
+        className="fixed bottom-48 right-16 text-green-400 opacity-12 z-5 hidden md:block" 
         animate={{ rotate: -360, scale: [1, 1.1, 1] }}
         transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
       >
@@ -301,16 +307,15 @@ function App() {
       </motion.div>
       
       <motion.div 
-        className="fixed top-3/4 right-1/3 text-purple-400 opacity-8 z-5" 
+        className="fixed top-3/4 right-1/3 text-purple-400 opacity-8 z-5 hidden lg:block" 
         animate={{ rotate: 360, y: [-5, 5, -5] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
       >
         <Percent size={12} />
       </motion.div>
 
-      {/* Newspaper Clipping Style Elements */}
       <motion.div 
-        className="fixed top-20 right-20 w-16 h-12 bg-gray-100 opacity-15 z-5 transform rotate-12 shadow-sm" 
+        className="fixed top-20 right-20 w-16 h-12 bg-gray-100 opacity-15 z-5 transform rotate-12 shadow-sm hidden md:block" 
         variants={floatingVariants} 
         animate="animate"
         style={{ 
@@ -320,7 +325,7 @@ function App() {
       />
       
       <motion.div 
-        className="fixed bottom-24 left-24 w-20 h-8 bg-yellow-100 opacity-20 z-5 transform -rotate-6 shadow-sm" 
+        className="fixed bottom-24 left-24 w-20 h-8 bg-yellow-100 opacity-20 z-5 transform -rotate-6 shadow-sm hidden md:block" 
         variants={floatingVariants} 
         animate="animate"
         transition={{ delay: 1 }}
@@ -330,9 +335,8 @@ function App() {
         }}
       />
 
-      {/* Barcode Style Elements */}
       <motion.div 
-        className="fixed top-40 left-4 w-12 h-6 opacity-10 z-5 transform rotate-45" 
+        className="fixed top-40 left-4 w-12 h-6 opacity-10 z-5 transform rotate-45 hidden md:block" 
         variants={floatingVariants} 
         animate="animate"
         style={{ 
@@ -341,7 +345,7 @@ function App() {
       />
       
       <motion.div 
-        className="fixed bottom-60 right-8 w-8 h-4 opacity-8 z-5 transform -rotate-30" 
+        className="fixed bottom-60 right-8 w-8 h-4 opacity-8 z-5 transform -rotate-30 hidden md:block" 
         variants={floatingVariants} 
         animate="animate"
         transition={{ delay: 2 }}
@@ -350,33 +354,31 @@ function App() {
         }}
       />
 
-      {/* Geometric Shapes with Enhanced Styling */}
       <motion.div 
-        className="fixed top-32 right-1/4 w-8 h-8 border-2 border-yellow-400 opacity-15 z-5" 
+        className="fixed top-32 right-1/4 w-8 h-8 border-2 border-yellow-400 opacity-15 z-5 hidden lg:block" 
         animate={{ rotate: 360 }} 
         transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         style={{ clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)' }}
       />
       
       <motion.div 
-        className="fixed bottom-32 left-1/3 w-6 h-6 border-2 border-blue-400 opacity-12 z-5" 
+        className="fixed bottom-32 left-1/3 w-6 h-6 border-2 border-blue-400 opacity-12 z-5 hidden lg:block" 
         animate={{ rotate: -360 }} 
         transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
       />
       
       <motion.div 
-        className="fixed top-1/2 left-8 w-4 h-4 bg-red-400 opacity-10 z-5" 
+        className="fixed top-1/2 left-8 w-4 h-4 bg-red-400 opacity-10 z-5 hidden md:block" 
         animate={{ rotate: 45, scale: [1, 1.3, 1] }} 
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         style={{ clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)' }}
       />
 
-      {/* Floating Circles with Different Sizes */}
       <motion.div className="fixed top-20 left-10 w-12 h-12 bg-yellow-400 rounded-full opacity-12 z-0" variants={floatingVariants} animate="animate" />
       <motion.div className="fixed top-40 right-20 w-8 h-8 bg-blue-500 rounded-full opacity-10 z-0" variants={floatingVariants} animate="animate" transition={{ delay: 1 }} />
-      <motion.div className="fixed bottom-40 left-20 w-16 h-16 bg-green-400 rounded-full opacity-8 z-0" variants={floatingVariants} animate="animate" transition={{ delay: 2 }} />
+      <motion.div className="fixed bottom-40 left-20 w-16 h-16 bg-green-400 rounded-full opacity-8 z-0 hidden md:block" variants={floatingVariants} animate="animate" transition={{ delay: 2 }} />
       <motion.div className="fixed top-60 left-1/2 w-6 h-6 bg-red-400 rounded-full opacity-8 z-0" variants={floatingVariants} animate="animate" transition={{ delay: 0.5 }} />
-      <motion.div className="fixed bottom-60 right-1/3 w-10 h-10 bg-purple-400 rounded-full opacity-10 z-0" variants={floatingVariants} animate="animate" transition={{ delay: 1.5 }} />
+      <motion.div className="fixed bottom-60 right-1/3 w-10 h-10 bg-purple-400 rounded-full opacity-10 z-0 hidden md:block" variants={floatingVariants} animate="animate" transition={{ delay: 1.5 }} />
       <motion.div className="fixed top-1/3 left-1/4 w-4 h-4 bg-pink-400 rounded-full opacity-6 z-0" variants={floatingVariants} animate="animate" transition={{ delay: 2.5 }} />
 
       {/* Top Navigation Bar */}
@@ -395,6 +397,7 @@ function App() {
             >
               RISHABH
             </motion.div>
+            {/* RESPONSIVE FIX: Desktop navigation */}
             <div className="hidden md:flex items-center space-x-8">
               {sections.map(section => (
                 <motion.button
@@ -410,8 +413,20 @@ function App() {
                 </motion.button>
               ))}
             </div>
+             {/* RESPONSIVE FIX: Mobile menu button (hamburger) */}
+            <div className="md:hidden">
+              <motion.button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="text-gray-300 hover:text-white"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </motion.button>
+            </div>
+            {/* RESPONSIVE FIX: Hide this on mobile to avoid duplication */}
             <motion.div 
-              className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center"
+              className="w-8 h-8 bg-yellow-400 rounded-full hidden md:flex items-center justify-center"
               whileHover={{ scale: 1.1, rotate: 90 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
@@ -419,6 +434,31 @@ function App() {
             </motion.div>
           </div>
         </div>
+         {/* RESPONSIVE FIX: Mobile menu container */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden bg-gray-900/90 backdrop-blur-md"
+            >
+              <div className="flex flex-col items-center space-y-4 py-4">
+                {sections.map(section => (
+                  <motion.button
+                    key={section}
+                    onClick={() => scrollToSection(section)}
+                    className={`text-lg font-medium transition-colors capitalize ${
+                      activeSection === section ? 'text-yellow-400' : 'text-gray-300 hover:text-white'
+                    }`}
+                  >
+                    {section}
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.nav>
 
       <motion.nav className="fixed top-1/2 right-4 md:right-8 transform -translate-y-1/2 z-50 bg-gray-800 bg-opacity-50 backdrop-blur-sm p-2 rounded-full hidden lg:block" initial={{ x: 100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 1.5, duration: 0.8, ease: "easeOut" }}>
@@ -434,7 +474,6 @@ function App() {
         </ul>
       </motion.nav>
 
-      {/* UPDATED: Simplified main container animation to a simple fade-in */}
       <motion.div className="max-w-5xl mx-auto rounded-lg shadow-2xl overflow-hidden relative z-10 mt-20" style={{ backgroundImage: 'url(/img2.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, ease: "easeOut" }}>
         <motion.div className="absolute -top-4 left-8 z-20" style={{ rotate: paperClipRotate }} whileHover={{ scale: 1.1, rotate: 20 }} transition={{ type: "spring", stiffness: 300 }}>
           <div className="w-16 h-20 bg-gradient-to-b from-gray-300 to-gray-400 rounded-t-full rounded-b-sm shadow-lg">
@@ -443,7 +482,6 @@ function App() {
           </div>
         </motion.div>
         
-        {/* Additional Decorative Elements on Main Container */}
         <motion.div 
           className="absolute -top-2 right-12 z-20" 
           animate={{ rotate: [0, 15, -15, 0] }}
@@ -464,19 +502,21 @@ function App() {
         </motion.div>
         
         <motion.div 
-          className="absolute -bottom-3 left-16 z-20" 
+          // RESPONSIVE FIX: Hidden on mobile to avoid clutter
+          className="absolute -bottom-3 left-16 z-20 hidden sm:block" 
           animate={{ rotate: [0, -10, 10, 0] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         >
           <Paperclip size={20} className="text-gray-600 opacity-60" />
         </motion.div>
 
-        <motion.div id="home" className="relative bg-white/70 backdrop-blur-sm p-8 border-b-2 border-gray-100/50" variants={containerVariants} initial="hidden" animate="visible">
+        {/* RESPONSIVE FIX: Adjusted padding for mobile (p-6) */}
+        <motion.div id="home" className="relative bg-white/70 backdrop-blur-sm p-6 md:p-8 border-b-2 border-gray-100/50" variants={containerVariants} initial="hidden" animate="visible">
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Mobile: Name comes first, Desktop: Photo first */}
-            <div className="lg:hidden order-1">
+            <div className="lg:hidden order-1 text-center">
               {/* Name slides in first on mobile */}
-              <motion.h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 flex overflow-hidden" initial={{ x: -100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}>
+              <motion.h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4 flex flex-wrap justify-center overflow-hidden" initial={{ x: -100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}>
                   {"RISHABH AGRAWAL".split("").map((char, index) => (
                       <motion.span key={index} initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.5, delay: 0.5 + index * 0.05 }}>
                           {char === " " ? "\u00A0" : char}
@@ -484,7 +524,7 @@ function App() {
                   ))}
               </motion.h1>
               {/* Bio slides in from right on mobile */}
-              <motion.p className="text-base md:text-lg text-gray-600 mb-6 leading-relaxed flex flex-wrap overflow-hidden" initial={{ x: 100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.8, ease: "easeOut", delay: 1 }}>
+              <motion.p className="text-base md:text-lg text-gray-600 mb-6 leading-relaxed flex flex-wrap justify-center overflow-hidden" initial={{ x: 100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.8, ease: "easeOut", delay: 1 }}>
                   {"I break problems into smaller ones—and sometimes break production in the process (but I fix it faster!).".split(" ").map((word, index) => (
                       <span key={index} className="flex mr-1.5">
                           {word.split("").map((char, charIndex) => (
@@ -497,15 +537,13 @@ function App() {
               </motion.p>
             </div>
 
-            {/* Photo section with enhanced size and animations */}
-            <motion.div className="w-full md:w-64 lg:w-72 flex-shrink-0 order-2 lg:order-1" initial={{ x: -200, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}>
+            {/* RESPONSIVE FIX: Centered photo on mobile and adjusted width */}
+            <motion.div className="w-full max-w-xs sm:max-w-sm md:w-64 lg:w-72 flex-shrink-0 order-2 lg:order-1 mx-auto lg:mx-0" initial={{ x: -200, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}>
               <motion.div className="w-full md:w-64 lg:w-72 h-80 md:h-80 lg:h-96 bg-yellow-400 rounded-lg overflow-hidden shadow-lg relative group mx-auto" initial={{ scale: 0.8, rotate: -5 }} animate={{ scale: 1, rotate: 0 }} transition={{ duration: 0.8, ease: "easeOut", delay: 0.5 }}>
                 <img src="/cutu.jpg" alt="Rishabh Agrawal" className="w-full h-full object-cover" />
-                {/* Enhanced Photo Decorations */}
                 <motion.div className="absolute -top-2 -left-2 w-10 h-5 bg-yellow-300/50 backdrop-blur-sm -rotate-45" initial={{ scale: 0, rotate: -45 }} animate={{ scale: 1, rotate: -45 }} transition={{ delay: 0.8, type: 'spring' }} />
                 <motion.div className="absolute -bottom-2 -right-2 w-10 h-5 bg-yellow-300/50 backdrop-blur-sm -rotate-45" initial={{ scale: 0, rotate: -45 }} animate={{ scale: 1, rotate: -45 }} transition={{ delay: 0.9, type: 'spring' }} />
                 
-                {/* Board Pin on Photo */}
                 <motion.div 
                   className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10" 
                   animate={{ rotate: [0, 5, -5, 0] }}
@@ -517,7 +555,6 @@ function App() {
                   </div>
                 </motion.div>
                 
-                {/* Sticker on Photo */}
                 <motion.div 
                   className="absolute top-2 -right-2 bg-green-400 text-white px-1.5 py-0.5 rounded text-xs font-bold shadow-sm z-10" 
                   style={{ transform: 'rotate(15deg)' }}
@@ -527,11 +564,9 @@ function App() {
                   ★
                 </motion.div>
                 
-                {/* Enhanced photo decorations */}
                 <motion.div className="absolute top-4 right-4 w-6 h-6 border-2 border-white/50 rounded-full" animate={{ rotate: 360 }} transition={{ duration: 8, repeat: Infinity, ease: "linear" }} />
                 <motion.div className="absolute bottom-4 left-4 w-4 h-4 bg-white/30 rounded-full" animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 2, repeat: Infinity }} />
                 
-                {/* Barcode Style Element */}
                 <motion.div 
                   className="absolute bottom-2 right-2 w-8 h-3 opacity-30" 
                   style={{ 
@@ -541,9 +576,8 @@ function App() {
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                 />
               </motion.div>
-              {/* My Story card slides from left after photo - Enhanced size */}
-              <motion.div className="mt-6 p-6 bg-yellow-50/80 backdrop-blur-sm rounded-lg border border-yellow-200 order-3" initial={{ opacity: 0, x: -100 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.2, duration: 0.8, ease: "easeOut" }}>
-                {/* Board Pin on My Story Card */}
+              {/* RESPONSIVE FIX: Adjusted padding (p-4) */}
+              <motion.div className="mt-6 p-4 md:p-6 bg-yellow-50/80 backdrop-blur-sm rounded-lg border border-yellow-200 order-3 relative" initial={{ opacity: 0, x: -100 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.2, duration: 0.8, ease: "easeOut" }}>
                 <motion.div 
                   className="absolute -top-2 left-4 z-10" 
                   animate={{ rotate: [0, 8, -8, 0] }}
@@ -554,7 +588,6 @@ function App() {
                   </div>
                 </motion.div>
                 
-                {/* Tape Effect */}
                 <motion.div 
                   className="absolute -top-1 right-8 w-12 h-4 bg-yellow-200/60 backdrop-blur-sm" 
                   style={{ transform: 'rotate(-8deg)' }}
@@ -566,12 +599,11 @@ function App() {
                   <h3 className="text-2xl md:text-3xl font-serif font-bold text-gray-800 mb-3 italic">My Story</h3>
                   <motion.div className="absolute bottom-0 left-0 w-full h-0.5 bg-yellow-400" initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.6, ease: 'easeOut', delay: 1.5 }} style={{ transformOrigin: 'left' }} />
                 </div>
-                <p className="text-base md:text-lg text-gray-700 leading-relaxed">My story isn't just about learning to code — it's about learning to create. From breaking down complex problems to building seamless experiences, I thrive at the sweet spot between logic and creativity. Every project I take on is a step toward shaping a smarter, more connected digital world.</p>
+                {/* RESPONSIVE FIX: Adjusted font size and leading for better readability on mobile */}
+                <p className="text-sm md:text-lg text-gray-700 leading-relaxed">My story isn't just about learning to code — it's about learning to create. From breaking down complex problems to building seamless experiences, I thrive at the sweet spot between logic and creativity. Every project I take on is a step toward shaping a smarter, more connected digital world.</p>
                 
-                {/* Enhanced story decorations */}
                 <motion.div className="absolute -bottom-2 -right-2 w-6 h-6 bg-yellow-400/20 rounded-full" animate={{ rotate: 360 }} transition={{ duration: 10, repeat: Infinity, ease: "linear" }} />
                 
-                {/* Small Sticker */}
                 <motion.div 
                   className="absolute bottom-2 left-2 bg-red-400 text-white px-1 py-0.5 rounded text-xs font-bold" 
                   style={{ transform: 'rotate(-12deg)' }}
@@ -583,9 +615,8 @@ function App() {
               </motion.div>
             </motion.div>
 
-            {/* Name and content section */}
-            <motion.div className="flex-1 flex flex-col order-4 lg:order-2">
-              {/* Name slides in after photo - Hidden on mobile, shown on desktop */}
+            {/* RESPONSIVE FIX: Centered text on mobile */}
+            <motion.div className="flex-1 flex flex-col order-4 lg:order-2 text-center lg:text-left">
               <motion.h1 className="hidden lg:flex text-5xl font-bold text-gray-900 mb-2 overflow-hidden" initial={{ x: 100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.8, ease: "easeOut", delay: 0.7 }}>
                   {"RISHABH AGRAWAL".split("").map((char, index) => (
                       <motion.span key={index} initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.5, delay: 0.9 + index * 0.05 }}>
@@ -593,7 +624,6 @@ function App() {
                       </motion.span>
                   ))}
               </motion.h1>
-              {/* Bio slides in from right - Hidden on mobile, shown on desktop */}
               <motion.p className="hidden lg:flex text-lg text-gray-600 mb-6 leading-relaxed flex-wrap overflow-hidden" initial={{ x: 100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.8, ease: "easeOut", delay: 1.4 }}>
                   {"I break problems into smaller ones—and sometimes break production in the process (but I fix it faster!).".split(" ").map((word, index) => (
                       <span key={index} className="flex mr-1.5">
@@ -606,18 +636,18 @@ function App() {
                   ))}
               </motion.p>
               
-              <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 lg:mt-0" initial={{ x: 100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.6, ease: "easeOut", delay: 1.8 }}>
-                <motion.div className="space-y-2" variants={itemVariants}>
+              {/* RESPONSIVE FIX: Grid layout for contact info now stacks on mobile */}
+              <motion.div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 lg:mt-0" initial={{ x: 100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.6, ease: "easeOut", delay: 1.8 }}>
+                {/* RESPONSIVE FIX: Items justified center on mobile */}
+                <motion.div className="space-y-2 flex flex-col items-center lg:items-start" variants={itemVariants}>
                   <motion.div className="flex items-center space-x-2" whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 300 }}><Calendar size={16} className="text-gray-600" /> <span className="text-gray-600">26th September 2004</span></motion.div>
                   <motion.div className="flex items-center space-x-2" whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 300 }}><Mail size={16} className="text-gray-600" /> <span className="text-gray-600">kumarvrishabh700@gmail.com</span></motion.div>
                   <motion.div className="flex items-center space-x-2" whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 300 }}><ExternalLink size={16} className="text-gray-600" /> <span className="text-gray-600">https://github.com/Rishabh7575</span></motion.div>
                 </motion.div>
-                <motion.div className="space-y-2" variants={itemVariants}><div className="flex items-center space-x-2"><MapPin size={16} className="text-gray-600" /> <span className="text-gray-600">LOC: Ghaziabad, India</span></div></motion.div>
+                <motion.div className="space-y-2 flex flex-col items-center lg:items-start" variants={itemVariants}><div className="flex items-center space-x-2"><MapPin size={16} className="text-gray-600" /> <span className="text-gray-600">LOC: Ghaziabad, India</span></div></motion.div>
               </motion.div>
 
-              {/* Off the Clock card slides from left */}
               <motion.div className="mt-6 p-5 bg-yellow-50/80 backdrop-blur-sm rounded-lg border border-yellow-200 relative overflow-hidden" initial={{ opacity: 0, x: -100 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, ease: "easeOut", delay: 2.2 }}>
-                {/* Washi Tape Effect */}
                 <motion.div 
                   className="absolute -top-2 left-8 w-16 h-6 bg-green-300/40 backdrop-blur-sm" 
                   style={{ transform: 'rotate(-5deg)' }}
@@ -625,7 +655,6 @@ function App() {
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                 />
                 
-                {/* Small Pin */}
                 <motion.div 
                   className="absolute top-1 right-4 z-10" 
                   animate={{ rotate: [0, 12, -12, 0] }}
@@ -637,16 +666,14 @@ function App() {
                 </motion.div>
                 
                 <h3 className="text-xl md:text-2xl font-serif font-bold text-gray-800 mb-4 italic">Off the Clock</h3>
-                <motion.div className="flex items-center justify-around">
+                <motion.div className="flex items-start sm:items-center justify-around">
                   {[{ icon: Coffee, text: "Fueling on coffee" }, { icon: Music, text: "Curating playlists" }, { icon: Gamepad2, text: "Exploring worlds" }].map((interest, index) => (
                     <motion.div key={index} className="flex flex-col items-center gap-2 text-center text-gray-600" initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.5, delay: 2.4 + index * 0.1 }} whileHover={{ scale: 1.15, color: "#111827" }} transition={{ type: "spring", stiffness: 300 }}><interest.icon size={32} /> <span className="text-xs md:text-sm">{interest.text}</span></motion.div>
                   ))}
                 </motion.div>
                 
-                {/* Enhanced card decorations */}
                 <motion.div className="absolute bottom-2 right-2 w-2 h-2 bg-yellow-400/30 rounded-full" animate={{ scale: [1, 1.5, 1] }} transition={{ duration: 3, repeat: Infinity }} />
                 
-                {/* Doodle Element */}
                 <motion.div 
                   className="absolute bottom-1 left-1 text-gray-400 opacity-40" 
                   animate={{ rotate: [0, 5, -5, 0] }}
@@ -656,9 +683,7 @@ function App() {
                 </motion.div>
               </motion.div>
 
-              {/* Core Strengths card slides from right */}
               <motion.div className="mt-6 p-5 bg-yellow-50/80 backdrop-blur-sm rounded-lg border border-yellow-200 relative overflow-hidden" initial={{ opacity: 0, x: 100 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, ease: "easeOut", delay: 2.6 }}>
-                {/* Paperclip on Core Strengths */}
                 <motion.div 
                   className="absolute -top-1 right-6 z-10" 
                   animate={{ rotate: [0, 10, -10, 0] }}
@@ -667,7 +692,6 @@ function App() {
                   <Paperclip size={16} className="text-gray-500 opacity-60" />
                 </motion.div>
                 
-                {/* Corner Fold Effect */}
                 <motion.div 
                   className="absolute top-0 right-0 w-6 h-6 bg-gray-200/40" 
                   style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}
@@ -685,10 +709,8 @@ function App() {
                   ))}
                 </motion.ul>
                 
-                {/* Enhanced card decorations */}
                 <motion.div className="absolute bottom-2 right-2 w-3 h-3 border border-yellow-400/30 rounded-full" animate={{ rotate: -360 }} transition={{ duration: 12, repeat: Infinity, ease: "linear" }} />
                 
-                {/* Small Tag */}
                 <motion.div 
                   className="absolute bottom-1 left-1 bg-blue-400 text-white px-1 py-0.5 rounded text-xs font-bold" 
                   style={{ transform: 'rotate(8deg)' }}
@@ -699,28 +721,32 @@ function App() {
                 </motion.div>
               </motion.div>
               
-              <motion.div className="mt-auto pt-6" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 3.5 }}>
-                <motion.button 
-                  className="bg-yellow-400 text-gray-900 font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-yellow-500 transition-all"
-                  whileHover={{ scale: 1.05, y: -5 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => window.open('http://xyz.com', '_blank')}
-                >
-                  VIEW MY RESUME
-                </motion.button>
-              </motion.div>
+              {/* RESPONSIVE FIX: Stacked buttons/contact info on mobile for clarity */}
+              <div className="mt-auto pt-6 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                  <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 3.5 }}>
+                    <motion.button 
+                      className="bg-yellow-400 text-gray-900 font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-yellow-500 transition-all w-full"
+                      whileHover={{ scale: 1.05, y: -5 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => window.open('http://xyz.com', '_blank')}
+                    >
+                      VIEW MY RESUME
+                    </motion.button>
+                  </motion.div>
 
-              <motion.div className="mt-auto pt-6 text-right" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 3.5 }}>
-                <motion.div className="text-red-500 italic mb-2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }}>Please don't hesitate to<br />reach me if this resume<br />doesn't provide enough<br />clarification</motion.div>
-                <motion.div className="flex items-center justify-end space-x-2" whileHover={{ x: -5 }} transition={{ type: "spring", stiffness: 300 }}><Phone size={16} className="text-red-500" /> <span className="text-gray-700">+91 8409066141</span></motion.div>
-                <motion.div className="flex items-center justify-end space-x-2 mt-1" whileHover={{ x: -5 }} transition={{ type: "spring", stiffness: 300 }}><Linkedin size={16} className="text-blue-600" /> <span className="text-gray-700">https://www.linkedin.com/in/rishabhkumar26</span></motion.div>
-                <div className="text-gray-700 mt-1">kumarvrishabh700@gmail.com</div>
-              </motion.div>
+                  <motion.div className="text-center sm:text-right" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 3.5 }}>
+                    <motion.div className="text-red-500 italic text-sm mb-2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }}>Please don't hesitate to reach me!</motion.div>
+                    <motion.div className="flex items-center justify-center sm:justify-end space-x-2 text-sm" whileHover={{ x: -5 }} transition={{ type: "spring", stiffness: 300 }}><Phone size={16} className="text-red-500" /> <span className="text-gray-700">+91 8409066141</span></motion.div>
+                    <motion.div className="flex items-center justify-center sm:justify-end space-x-2 mt-1 text-sm" whileHover={{ x: -5 }} transition={{ type: "spring", stiffness: 300 }}><Linkedin size={16} className="text-blue-600" /> <span className="text-gray-700">/in/rishabhkumar26</span></motion.div>
+                  </motion.div>
+              </div>
+
             </motion.div>
           </div>
         </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-8 p-8 bg-white/70 backdrop-blur-sm">
+        {/* RESPONSIVE FIX: Adjusted padding for mobile (p-6) */}
+        <div className="grid lg:grid-cols-2 gap-8 p-6 md:p-8 bg-white/70 backdrop-blur-sm">
           <div className="space-y-8">
             <motion.section id="experience" initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} viewport={{ once: true }}>
               <SectionHeader title="Work Experiences" />
@@ -729,7 +755,6 @@ function App() {
                   <motion.div key={index} className="border-l-4 border-yellow-400 pl-6 relative p-4 rounded-r-lg bg-white/50" variants={itemVariants} whileHover={{ x: 5, backgroundColor: "#ffffff" }} transition={{ type: "spring", stiffness: 300 }}>
                     <motion.div className="absolute -left-2 top-0 w-4 h-4 bg-yellow-400 rounded-full border-2 border-white" animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }} />
                     <div className="text-sm text-gray-600 mb-1">{job.period}</div>
-                    {/* UPDATED with WavyText */}
                     <WavyText text={job.title} el="h3" className="text-xl font-bold text-gray-900 mb-1" />
                     <div className="text-gray-700 mb-1">{job.company} • <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">{job.type}</span></div>
                     <div className="text-sm text-gray-600">{job.location}</div>
@@ -745,7 +770,6 @@ function App() {
                   <motion.div key={index} className="border-l-4 border-yellow-400 pl-6 relative p-4 rounded-r-lg bg-white/50" variants={itemVariants} whileHover={{ x: 5, backgroundColor: "#ffffff" }} transition={{ type: "spring", stiffness: 300 }}>
                     <motion.div className="absolute -left-2 top-0 w-4 h-4 bg-yellow-400 rounded-full border-2 border-white" animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} />
                     <div className="text-sm text-gray-600 mb-1">{edu.period}</div>
-                    {/* UPDATED with WavyText */}
                     <WavyText text={edu.institution} el="h3" className="text-xl font-bold text-gray-900 mb-1" />
                     <div className="text-gray-700 mb-1">{edu.degree} • <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-bold">{edu.grade}</span></div>
                     <div className="text-sm text-gray-600">{edu.location}</div>
@@ -758,29 +782,32 @@ function App() {
           <div className="space-y-8">
             <motion.section id="skills" initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} viewport={{ once: true }}>
               <SectionHeader title="Area of Expertise" />
-              <motion.div className="relative h-96 flex items-center justify-center" initial={{ scale: 0.8, opacity: 0 }} whileInView={{ scale: 1, opacity: 1 }} transition={{ duration: 0.8, ease: "easeOut" }} viewport={{ once: true }}>
+              {/* RESPONSIVE FIX: Rebuilt this section for mobile. Original absolute layout is hidden on mobile and tablet (lg:flex), new flexbox layout shown instead (flex lg:hidden). */}
+              <div className="relative h-96 hidden lg:flex items-center justify-center">
                   <motion.div className="absolute w-64 h-20 bg-[#D3A429]/90 backdrop-blur-sm flex items-center justify-center" style={{ clipPath: 'polygon(15% 0, 85% 0, 100% 100%, 0% 100%)', top: '20%' }} initial={{ y: -50, opacity: 0, rotate: -10 }} whileInView={{ y: 0, opacity: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 200, delay: 0.2 }} whileHover={{ scale: 1.1, y: -10, rotate: 3, boxShadow: "0 10px 30px rgba(211, 164, 41, 0.4)" }} viewport={{ once: true }}><motion.h3 className="text-white font-bold text-lg tracking-wider" initial={{ letterSpacing: '0px' }} whileHover={{ letterSpacing: '3px' }} transition={{ duration: 0.3 }}>BLOCKCHAIN </motion.h3></motion.div>
                   <motion.div className="absolute w-40 h-40 bg-[#D84545]/90 backdrop-blur-sm flex flex-col items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%)', left: '5%', top: '45%' }} initial={{ x: -60, opacity: 0, scale: 0.5 }} whileInView={{ x: 0, opacity: 1, scale: 1 }} transition={{ type: 'spring', stiffness: 200, delay: 0.4 }} whileHover={{ scale: 1.15, x: -10, rotate: -5, boxShadow: "0 15px 40px rgba(216, 69, 69, 0.4)" }} viewport={{ once: true }}><motion.h3 className="text-white font-bold text-4xl" initial={{ scale: 0 }} whileInView={{ scale: 1 }} transition={{ delay: 0.6, type: 'spring', stiffness: 300 }} viewport={{ once: true }}>BACKEND</motion.h3><motion.p className="text-white text-lg tracking-widest" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ delay: 0.8 }} viewport={{ once: true }}>DEVELOPMENT</motion.p></motion.div>
                   <motion.div className="absolute w-48 h-16 bg-[#43A4D3]/90 backdrop-blur-sm flex items-center justify-center" style={{ clipPath: 'polygon(0 0, 100% 25%, 100% 100%, 0 100%)', left: '30%', top: '75%' }} initial={{ y: 50, opacity: 0, rotate: 10 }} whileInView={{ y: 0, opacity: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 200, delay: 0.6 }} whileHover={{ scale: 1.1, y: 10, rotate: 2, boxShadow: "0 10px 30px rgba(67, 164, 211, 0.4)" }} viewport={{ once: true }}><motion.h3 className="text-white font-bold text-lg tracking-wider" initial={{ letterSpacing: '0px' }} whileHover={{ letterSpacing: '3px' }} transition={{ duration: 0.3 }}>AI & MACHINE LEARNING</motion.h3></motion.div>
                   <motion.div className="absolute w-48 h-16 bg-[#5AB889]/90 backdrop-blur-sm flex items-center justify-center" style={{ clipPath: 'polygon(0 25%, 100% 0, 100% 100%, 0 100%)', right: '5%', top: '55%' }} initial={{ x: 60, opacity: 0, rotate: -10 }} whileInView={{ x: 0, opacity: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 200, delay: 0.8 }} whileHover={{ scale: 1.1, x: 10, rotate: -3, boxShadow: "0 10px 30px rgba(90, 184, 137, 0.4)" }} viewport={{ once: true }}><motion.h3 className="text-white font-bold text-lg tracking-wider" initial={{ letterSpacing: '0px' }} whileHover={{ letterSpacing: '3px' }} transition={{ duration: 0.3 }}>REACT DEVELOPER</motion.h3></motion.div>
-                  
-                  {/* Floating particles */}
-                  <motion.div className="absolute w-2 h-2 bg-yellow-400 rounded-full" style={{ top: '10%', left: '20%' }} animate={{ y: [-5, 5, -5], opacity: [0.3, 1, 0.3] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} />
-                  <motion.div className="absolute w-1 h-1 bg-blue-400 rounded-full" style={{ top: '80%', right: '25%' }} animate={{ y: [5, -5, 5], opacity: [0.5, 1, 0.5] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }} />
-                  <motion.div className="absolute w-1.5 h-1.5 bg-green-400 rounded-full" style={{ top: '30%', right: '15%' }} animate={{ y: [-3, 3, -3], opacity: [0.4, 1, 0.4] }} transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} />
+              </div>
+              <motion.div className="flex lg:hidden flex-col space-y-4 items-center" initial="hidden" whileInView="visible" variants={containerVariants} viewport={{once: true}}>
+                {[{title: "BLOCKCHAIN", color:"bg-[#D3A429]/90"}, {title: "BACKEND DEV", color:"bg-[#D84545]/90"}, {title: "AI & ML", color:"bg-[#43A4D3]/90"}, {title: "REACT DEV", color:"bg-[#5AB889]/90"}].map((area, i) => (
+                    <motion.div key={i} variants={itemVariants} className={`w-full text-center p-4 rounded-lg shadow-lg text-white font-bold text-lg ${area.color}`}>
+                        {area.title}
+                    </motion.div>
+                ))}
               </motion.div>
             </motion.section>
 
-            {/* UPDATED Software Skills Section */}
             <motion.section initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} viewport={{ once: true }}>
               <SectionHeader title="Software Skills">
                 <motion.svg className="absolute top-2 -right-10 w-16 h-12" viewBox="0 0 100 100" initial={{ opacity: 0, rotate: -180 }} whileInView={{ opacity: 1, rotate: 0 }} transition={{ delay: 0.5, duration: 0.8 }} viewport={{ once: true }}><motion.path d="M20 30 C 40 10, 60 60, 80 40 S 90 70, 70 80" stroke="#2dd4bf" strokeWidth="4" fill="transparent" initial={{ pathLength: 0, opacity: 0 }} whileInView={{ pathLength: 1, opacity: 1 }} transition={{ duration: 2, ease: "easeInOut", delay: 0.8 }} viewport={{ once: true }} /></motion.svg>
               </SectionHeader>
-              <motion.div className="grid grid-cols-3 gap-4" initial={{ scale: 0.8, opacity: 0 }} whileInView={{ scale: 1, opacity: 1 }} transition={{ duration: 0.6, ease: "easeOut" }} viewport={{ once: true }}>
+              {/* RESPONSIVE FIX: Changed grid columns. Now 2 on mobile, 3 on sm screens and up. */}
+              <motion.div className="grid grid-cols-2 sm:grid-cols-3 gap-4" initial={{ scale: 0.8, opacity: 0 }} whileInView={{ scale: 1, opacity: 1 }} transition={{ duration: 0.6, ease: "easeOut" }} viewport={{ once: true }}>
                 {softwareSkills.map((skill, index) => (
                   <motion.div 
                     key={index} 
-                    className={`${skill.color} text-white p-4 rounded-lg shadow-lg overflow-hidden ${skill.icon ? 'cursor-pointer' : ''} relative flex flex-col justify-center items-center h-32`} 
+                    className={`${skill.color} text-white p-4 rounded-lg shadow-lg overflow-hidden ${skill.icon ? 'cursor-pointer' : ''} relative flex flex-col justify-center items-center h-28 sm:h-32`} 
                     initial={{ y: 50, opacity: 0, rotate: Math.random() * 20 - 10 }} 
                     whileInView={{ y: 0, opacity: 1, rotate: 0 }} 
                     transition={{ duration: 0.6, delay: index * 0.1, type: "spring", stiffness: 200 }} 
@@ -798,7 +825,7 @@ function App() {
                         <>
                           <skill.icon size={32} className="mx-auto" />
                           <motion.div 
-                            className="text-sm mt-2" 
+                            className="text-xs sm:text-sm mt-2" 
                             initial={{ y: 20, opacity: 0 }} 
                             whileInView={{ y: 0, opacity: 1 }} 
                             transition={{ delay: index * 0.1 + 0.6 }} 
@@ -838,8 +865,10 @@ function App() {
           </div>
         </div>
 
-        <motion.section id="projects" className="bg-gray-50/70 backdrop-blur-sm p-8" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
+        {/* RESPONSIVE FIX: Adjusted padding for mobile (p-6) */}
+        <motion.section id="projects" className="bg-gray-50/70 backdrop-blur-sm p-6 md:p-8" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
           <SectionHeader title="Featured Projects" />
+          {/* RESPONSIVE FIX: Grid defaults to 1 column on mobile, which is correct. No changes needed here as it's already responsive. */}
           <motion.div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6" initial={{ scale: 0.9, opacity: 0 }} whileInView={{ scale: 1, opacity: 1 }} transition={{ duration: 0.8, ease: "easeOut" }} viewport={{ once: true }}>
             {[{ title: "Brand Identity Design", description: "Complete brand identity package including logo, business cards, and marketing materials.", category: "Branding", color: "bg-purple-500", github: "https://github.com/Rishabh7575" }, { title: "Motion Graphics Reel", description: "Animated promotional video showcasing product features with smooth transitions.", category: "Animation", color: "bg-blue-500", github: "https://github.com/Rishabh7575" }, { title: "UI/UX Mobile App", description: "Modern mobile application design with intuitive user experience and clean interface.", category: "UI Design", color: "bg-green-500", github: "https://github.com/Rishabh7575" }, { title: "Editorial Layout", description: "Magazine layout design with creative typography and visual hierarchy.", category: "Print Design", color: "bg-red-500", github: "https://github.com/Rishabh7575" }, { title: "Social Media Campaign", description: "Comprehensive social media visual campaign with consistent branding.", category: "Digital Marketing", color: "bg-orange-500", github: "https://github.com/Rishabh7575" }, { title: "3D Product Visualization", description: "Photorealistic 3D renders for product showcase and marketing materials.", category: "3D Design", color: "bg-cyan-500", github: "https://github.com/Rishabh7575" }].map((project, index) => (
               <motion.div key={index} className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden group relative" initial={{ y: 100, opacity: 0, rotate: Math.random() * 10 - 5 }} whileInView={{ y: 0, opacity: 1, rotate: 0 }} transition={{ duration: 0.8, delay: index * 0.15, type: "spring", stiffness: 200 }} whileHover={{ y: -15, scale: 1.02, rotate: Math.random() * 3 - 1.5, boxShadow: "0 25px 50px rgba(0,0,0,0.2)", zIndex: 10 }} viewport={{ once: true }}>
@@ -851,7 +880,6 @@ function App() {
                 </motion.div>
                 <motion.div className="p-6" initial={{ y: 20, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }} transition={{ delay: index * 0.15 + 0.6 }} viewport={{ once: true }}>
                   <motion.div className="text-sm text-gray-500 mb-2" initial={{ x: -20, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} transition={{ delay: index * 0.15 + 0.7 }} viewport={{ once: true }}>{project.category}</motion.div>
-                  {/* UPDATED with WavyText */}
                   <WavyText text={project.title} el="h3" className="text-xl font-bold text-gray-900 mb-3" />
                   <motion.p className="text-gray-600 text-sm leading-relaxed mb-4" initial={{ y: 10, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }} transition={{ delay: index * 0.15 + 0.9 }} viewport={{ once: true }}>{project.description}</motion.p>
                   <motion.a href={project.github} target="_blank" rel="noopener noreferrer" className="inline-flex items-center space-x-2 text-gray-700 hover:text-gray-900 transition-colors" initial={{ x: -10, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} transition={{ delay: index * 0.15 + 1.1 }} whileHover={{ x: 8, scale: 1.05 }} viewport={{ once: true }}><Github size={16} /> <span className="text-sm font-medium">View Code</span></motion.a>
@@ -861,11 +889,14 @@ function App() {
           </motion.div>
         </motion.section>
 
-        <motion.section id="contact" className="bg-yellow-400/80 backdrop-blur-sm p-8 relative overflow-hidden" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
+        {/* RESPONSIVE FIX: Adjusted padding for mobile (p-6) */}
+        <motion.section id="contact" className="bg-yellow-400/80 backdrop-blur-sm p-6 md:p-8 relative overflow-hidden" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
           <motion.div className="absolute top-10 left-10 w-20 h-20 bg-white opacity-10 rounded-full" animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }} transition={{ duration: 8, repeat: Infinity }} />
           <motion.div className="absolute bottom-10 right-10 w-16 h-16 bg-white opacity-10 rounded-full" animate={{ scale: [1.2, 1, 1.2], rotate: [360, 180, 0] }} transition={{ duration: 6, repeat: Infinity }} />
           <div className="max-w-4xl mx-auto relative z-10">
-            <motion.h2 className="text-4xl font-bold text-gray-900 text-center mb-8" initial={{ y: 30, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }} transition={{ duration: 0.6 }} viewport={{ once: true }}>Let's Work Together</motion.h2>
+            {/* RESPONSIVE FIX: Adjusted font size for mobile */}
+            <motion.h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-8" initial={{ y: 30, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }} transition={{ duration: 0.6 }} viewport={{ once: true }}>Let's Work Together</motion.h2>
+            {/* RESPONSIVE FIX: Grid defaults to 1 column on mobile, which is correct. No changes needed here. */}
             <div className="grid md:grid-cols-2 gap-8">
               <motion.div className="bg-white/80 backdrop-blur-sm rounded-lg p-6 shadow-lg" initial={{ x: -50, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} transition={{ duration: 0.6, delay: 0.2 }} viewport={{ once: true }}>
                 <h3 className="text-2xl font-bold text-gray-900 mb-6">Send Message</h3>
